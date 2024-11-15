@@ -8,7 +8,7 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">My Website</a>
+        <a class="navbar-brand" href="#">SAD</a>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
@@ -21,9 +21,9 @@
     <div class="container mt-5">
         <div class="jumbotron">
             <h1 class="display-4">Welcome to My Website!</h1>
-            <p class="lead">This is a simple welcome message that you can modify.</p>
+            <p class="lead">Here you can make Calculated desisions.</p>
             <hr class="my-4">
-            <p>Click the login button in the navigation bar to access the admin login form.</p>
+            <p>Log In and Start The Adventure .</p>
         </div>
     </div>
 
