@@ -46,52 +46,12 @@
                     if (data.html) {
                         document.getElementById('dynamic-content').innerHTML = data.html; // Update content
 
-                        // Add event listener for the new form
-                        document.getElementById('criteria-names-weights-form').addEventListener('submit', function(event) {
-                            event.preventDefault(); // Prevent default submission
-
-                            let formData = new FormData(this);
-                            let criteriaNames = [];
-                            let criteriaWeights = [];
-                            formData.forEach((value, key) => {
-                                if (key.startsWith('criteria_names')) {
-                                    criteriaNames.push(value);
-                                } else if (key.startsWith('criteria_weights')) {
-                                    criteriaWeights.push(value);
-                                }
-                            });
-
-                            // Show loading feedback
-                            document.getElementById('dynamic-content').innerHTML = '<p>Loading...</p>';
-
-                            // Send the request
-                            fetch('{{ route("criteria.storeNamesWeights") }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}' // CSRF token
-                                },
-                                body: JSON.stringify({ criteria_names: criteriaNames, criteria_weights: criteriaWeights })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.html) {
-                                    document.getElementById('dynamic-content').innerHTML = data.html; // Update content
-                                } else {
-                                    document.getElementById('dynamic-content').innerHTML = '<p>No content available.</p>'; // Fallback
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                document.getElementById('dynamic-content').innerHTML = '<p>An error occurred. Please try again later.</p>';
-                            });
-                        });
+                        
                     } else {
                         document.getElementById('dynamic-content').innerHTML = '<p>No content available.</p>'; // Fallback
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     document.getElementById('dynamic-content').innerHTML = '<p>An error occurred. Please try again later.</p>';
                 });
             });
