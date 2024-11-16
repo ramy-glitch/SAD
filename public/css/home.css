@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+}
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    background-color: #333;
+    padding: 1rem;
+}
+.navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+}
+.navbar a:hover {
+    background-color: #575757;
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+}
+.grid-item {
+    background-color: #f1f1f1;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+.grid-item img {
+    max-width: 100%;
+    height: auto;
+}

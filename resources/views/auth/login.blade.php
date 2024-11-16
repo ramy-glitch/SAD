@@ -24,7 +24,7 @@
                 <div class="card">
                     <div class="card-header">Admin Login</div>
                     <div class="card-body">
-                        <form method="POST" action="{{ route('admin.login') }}">
+                        <form method="POST" action="{{ route('admin.loginf') }}">
                             @csrf
                             <div class="form-group">
                                 <label for="email">Email</label>

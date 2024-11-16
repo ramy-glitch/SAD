@@ -9,7 +9,7 @@ Route::get('/', function () {
 });
 
 Route::get('/loginpage', [AuthController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('admin.loginf');
 Route::post('logout', [AuthController::class, 'logout'])->name('admin.logout');
 
 Route::middleware('auth:admin')->group(function () {
