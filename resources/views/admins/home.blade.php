@@ -20,13 +20,13 @@
 
     <div class="grid-container">
         <div class="grid-item">
-            <h2>Block 1</h2>
-            <img src="path/to/image1.jpg" alt="Image 1">
-            <p><a href="#">Go to Section 1</a></p>
+            <h2>WSM</h2>
+            <img src="{{ asset('images/wsm-gdynia.svg') }}" alt="Image 1">
+            <p><a href="#">Click here</a></p>
         </div>
         <div class="grid-item">
             <h2>Block 2</h2>
-            <img src="path/to/image2.jpg" alt="Image 2">
+            <img src="{{ asset('images/image1.jpg') }}" alt="Image 2">
             <p><a href="#">Go to Section 2</a></p>
         </div>
         <!-- Add more blocks as needed -->
