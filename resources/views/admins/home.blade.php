@@ -14,7 +14,7 @@
         <div class="grid-item">
             <h2>WSM</h2>
             <img src="{{ asset('images/wsm-gdynia.svg') }}" alt="Image 1">
-            <p><a href="{{route('swm.index')}}">Click here</a></p>
+            <p><a href="{{route('wsm.index')}}">Click here</a></p>
         </div>
         <div class="grid-item">
             <h2>Block 2</h2>

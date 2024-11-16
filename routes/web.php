@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\SwmController;
+use App\Http\Controllers\WsmController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -16,5 +16,8 @@ Route::post('logout', [AuthController::class, 'logout'])->name('admin.logout');
 
 Route::middleware('auth:admin')->group(function () {
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('swm', [SwmController::class, 'index'])->name('swm.index');
+    Route::get('wsm', [WsmController::class, 'index'])->name('wsm.index');
+    
+    Route::post('/criteria-submit', [CriteriaController::class, 'submit'])->name('criteria.submit');
+    Route::post('/store-criteria-names-weights', [CriteriaController::class, 'storeCriteriaNamesWeights'])->name('criteria.storeNamesWeights');
 });
