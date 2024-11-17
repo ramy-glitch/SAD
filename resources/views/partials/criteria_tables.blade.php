@@ -30,7 +30,7 @@
                 <tr>
                     <th>Alternative</th>
                     @foreach ($criteriaNames as $name)
-                        <th>{{ $name }}</th>
+                        <th>{{ $name }} score</th>
                     @endforeach
                     <th>WSM</th>
                 </tr>
