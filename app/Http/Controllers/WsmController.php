@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
+
 class WsmController extends Controller
 {
     public function index()
@@ -14,7 +15,6 @@ class WsmController extends Controller
 
     public function criteriaNum(Request $request)
     {
-        try {
             $criteria = $request->input('criteria');
 
             // Validate input
@@ -27,9 +27,6 @@ class WsmController extends Controller
             $html = view('partials.criteria_names_weights_form', compact('criteria'))->render();
 
             return response()->json(['html' => $html]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500); // Ensure JSON format for errors
-        }
     }
 
     public function storeCriteriaNamesWeights(Request $request)
@@ -39,10 +36,8 @@ class WsmController extends Controller
 
         // Store the criteria names and weights in the session or database as needed
         Session::put('criteria_names', $criteriaNames);
-        Session::put('criteria_weights', $criteriaWeights);
+        Session::put('criteria_weights', $criteriaWeights); 
 
-
-
-        return view('wsm.criteria_tables', compact('criteriaNames', 'criteriaWeights'));
+        return  view('wsm.criteria_tables', compact('criteriaNames', 'criteriaWeights'));
     }
 }

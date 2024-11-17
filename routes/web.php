@@ -17,6 +17,6 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('wsm', [WsmController::class, 'index'])->name('wsm.index');
     
-    Route::post('wsm', [WsmController::class, 'criteriaNum'])->name('criteria.submit');
-    Route::post('wsm', [WsmController::class, 'storeCriteriaNamesWeights'])->name('criteria.storeNamesWeights');
+    Route::post('wsm/number-of-criteria', [WsmController::class, 'criteriaNum'])->name('criteria.submit');
+    Route::post('wsm/names-weights-of-criteria', [WsmController::class, 'storeCriteriaNamesWeights'])->name('criteria.storeNamesWeights');
 });

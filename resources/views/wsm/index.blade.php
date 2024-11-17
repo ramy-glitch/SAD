@@ -46,7 +46,7 @@
                         document.getElementById('dynamic-content').innerHTML = data.html; // Update content
 
 /***********************  critera names and weights  *********************/
-
+/*
                         // Add event listener for the new form
                         document.getElementById('criteria-names-weights-form').addEventListener('submit', function(event) {
                             event.preventDefault(); // Prevent default submission
@@ -62,48 +62,34 @@
                                 }
                             });
 
-                            // Show loading feedback
-                            document.getElementById('dynamic-content').innerHTML = '<p>Loading...</p>';
-
-                            // Send the request
-                            fetch('{{ route("criteria.storeNamesWeights") }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}' // CSRF token
-                                },
-                                body: JSON.stringify({ criteria_names: criteriaNames, criteria_weights: criteriaWeights })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.html) {
-                                    document.getElementById('dynamic-content').innerHTML = data.html; // Update content
-
-/**********************  the table  **************************/
-
-
-
-
-
-
-
-
-/*************************  the table  ***********************/
-
-
-                                } else {
-                                    document.getElementById('dynamic-content').innerHTML = '<p>No content available.</p>'; // Fallback
+                            // Validate the criteria weights, i want to make sure that the sum of the weights of all criteria is equal to one , and the weight can't be below 0.001
+                            let totalWeight = 0;
+                            for (let i = 0; i < criteriaWeights.length; i++) {
+                                let weight = parseFloat(criteriaWeights[i]);
+                                if (isNaN(weight) || weight < 0.001) {
+                                    alert('Please enter a valid weight for all criteria.');
+                                    return;
                                 }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                document.getElementById('dynamic-content').innerHTML = '<p>An error occurred. Please try again later.</p>';
-                            });
+                                totalWeight += weight;
+                            }
+
+                            if (Math.abs(totalWeight - 1) > 0.001) {
+                                alert('The sum of the weights of all criteria must be equal to 1.');
+                                return;
+                            }
+
+                            //execute the sumission of the form
+
+                            document.getElementById('criteria-names-weights-form').submit();
+                            
+
+
+
                         });
 
 
 
-
+*/
 
 /*************************  critera names and weights  ***********************/
 
