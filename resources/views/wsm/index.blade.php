@@ -79,7 +79,7 @@
                                 if (data.html) {
                                     document.getElementById('dynamic-content').innerHTML = data.html; // Update content
 
-/**********************  nbre d'alternatives  **************************/
+/**********************  the table  **************************/
 
 
 
@@ -88,7 +88,7 @@
 
 
 
-/*************************  nbre d'alternatives  ***********************/
+/*************************  the table  ***********************/
 
 
                                 } else {
