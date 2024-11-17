@@ -41,9 +41,8 @@ class WsmController extends Controller
         Session::put('criteria_names', $criteriaNames);
         Session::put('criteria_weights', $criteriaWeights);
 
-        // Generate the tables layout
-        $html = view('partials.criteria_tables', compact('criteriaNames', 'criteriaWeights'))->render(); // Render the tables layout
 
-        return response()->json(['html' => $html]); // Return the HTML as a JSON response
+
+        return view('wsm.criteria_tables', compact('criteriaNames', 'criteriaWeights'));
     }
 }
