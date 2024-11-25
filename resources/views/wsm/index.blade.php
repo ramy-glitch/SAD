@@ -46,50 +46,93 @@
                         document.getElementById('dynamic-content').innerHTML = data.html; // Update content
 
 /***********************  critera names and weights  *********************/
-/*
-                        // Add event listener for the new form
-                        document.getElementById('criteria-names-weights-form').addEventListener('submit', function(event) {
-                            event.preventDefault(); // Prevent default submission
-
-                            let formData = new FormData(this);
-                            let criteriaNames = [];
-                            let criteriaWeights = [];
-                            formData.forEach((value, key) => {
-                                if (key.startsWith('criteria_names')) {
-                                    criteriaNames.push(value);
-                                } else if (key.startsWith('criteria_weights')) {
-                                    criteriaWeights.push(value);
-                                }
-                            });
-
-                            // Validate the criteria weights, i want to make sure that the sum of the weights of all criteria is equal to one , and the weight can't be below 0.001
-                            let totalWeight = 0;
-                            for (let i = 0; i < criteriaWeights.length; i++) {
-                                let weight = parseFloat(criteriaWeights[i]);
-                                if (isNaN(weight) || weight < 0.001) {
-                                    alert('Please enter a valid weight for all criteria.');
-                                    return;
-                                }
-                                totalWeight += weight;
-                            }
-
-                            if (Math.abs(totalWeight - 1) > 0.001) {
-                                alert('The sum of the weights of all criteria must be equal to 1.');
-                                return;
-                            }
-
-                            //execute the sumission of the form
-
-                            document.getElementById('criteria-names-weights-form').submit();
-                            
 
 
 
-                        });
+
+    document.getElementById('criteria-names-weights-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default submission
+
+        let criteriaNames = [];
+        let criteriaWeights = [];
+        let isValid = true;
+
+        // Collect and validate criteria names
+        document.querySelectorAll('input[name="criteria_names[]"]').forEach(function(input) {
+            let name = input.value.trim();
+            if (!name) {
+                alert('Criterion names cannot be empty.');
+                isValid = false;
+                return;
+            }
+            if (criteriaNames.includes(name)) {
+                alert('Criterion names must not be repeated.');
+                isValid = false;
+                return;
+            }
+            criteriaNames.push(name);
+        });
+
+        if (!isValid) return;
+
+        // Collect and validate criteria weights
+        document.querySelectorAll('input[name="criteria_weights[]"]').forEach(function(input) {
+            let weight = parseFloat(input.value);
+            if (isNaN(weight) || weight < 0.01 || weight > 1) {
+                alert('Criterion weights must be between 0.01 and 1.');
+                isValid = false;
+                return;
+            }
+            criteriaWeights.push(weight);
+        });
+
+        if (!isValid) return;
+
+        // Validate the sum of weights
+        let totalWeight = criteriaWeights.reduce((sum, weight) => sum + weight, 0);
+        if (totalWeight !== 1) {
+            alert('The sum of all weights must be equal to 1.');
+            return;
+        }
+
+        // If all validations pass, send AJAX request
+        fetch('{{ route("criteria.store") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}' // CSRF token
+            },
+            body: JSON.stringify({
+                criteria_names: criteriaNames,
+                criteria_weights: criteriaWeights
+            })
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                return response.text();
+            }
+        })
+        .then(html => {
+            if (html) {
+                document.open();
+                document.write(html);
+                document.close();
+            }
+        })
+        .catch(error => {
+            alert('An error occurred. Please try again.');
+        });
+    });
 
 
 
-*/
+
+
+
+
+
 
 /*************************  critera names and weights  ***********************/
 
