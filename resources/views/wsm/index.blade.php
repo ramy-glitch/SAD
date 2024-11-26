@@ -50,6 +50,7 @@
 
 
 
+
     document.getElementById('criteria-names-weights-form').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent default submission
 
@@ -96,7 +97,7 @@
         }
 
         // If all validations pass, send AJAX request
-        fetch('{{ route("criteria.store") }}', {
+        fetch('{{ route("criteria.storeNamesWeights") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -125,6 +126,7 @@
             alert('An error occurred. Please try again.');
         });
     });
+
 
 
 

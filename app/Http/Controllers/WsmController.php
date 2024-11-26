@@ -30,6 +30,7 @@ class WsmController extends Controller
     }
 
 
+
     public function storeCriteriaNamesWeights(Request $request)
     {
         // Validate the request data
@@ -49,13 +50,20 @@ class WsmController extends Controller
             return back()->withErrors(['criteria_weights' => 'The sum of all weights must be equal to 1.']);
         }
     
-        // If validation passes, proceed with storing or processing the data
-        // For example, you can store the data in the session or database
-    
-        // Redirect to the specified view upon success
-        return redirect()->route('criteria.tables')->with([
+        // Store the data in the session
+        session([
             'criteriaNames' => $criteriaNames,
             'criteriaWeights' => $criteriaWeights
         ]);
+    
+        // Redirect to the specified view upon success
+        return redirect()->route('criteria.tables');
+    }
+    
+    public function criteriaTables()
+    {
+        $criteriaNames = session('criteriaNames', []);
+        $criteriaWeights = session('criteriaWeights', []);
+        return view('wsm.criteria_tables', compact('criteriaNames', 'criteriaWeights'));
     }
 }

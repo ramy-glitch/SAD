@@ -21,6 +21,5 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('wsm/names-weights-of-criteria', [WsmController::class, 'storeCriteriaNamesWeights'])->name('criteria.storeNamesWeights');
 
     // Route to display the criteria tables view
-    Route::get('/criteria/tables', function () {return view('wsm.criteria_tables');})->name('criteria.tables');
-    
+    Route::get('/criteria/tables', [WsmController::class, 'criteriaTables'])->name('criteria.tables');
 });
