@@ -65,11 +65,12 @@ class WsmController extends Controller
     }
 
     
+
     public function clearSessionData()
     {
         // Clear the session values related to criteria and alternatives
-        Session::forget(['criteriaNames', 'criteriaWeights', 'alternatives']);
-
+        Session::forget(['alternatives']);
+    
         return response()->json(['status' => 'Session data cleared']);
     }
 
