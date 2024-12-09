@@ -45,98 +45,104 @@
                     if (data.html) {
                         document.getElementById('dynamic-content').innerHTML = data.html; // Update content
 
-/***********************  critera names and weights  *********************/
+/***********************  criteria names, weights, and intervals  *********************/
 
+document.getElementById('criteria-names-weights-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default submission
 
+    let criteriaNames = [];
+    let criteriaWeights = [];
+    let intervals = [];
+    let isValid = true;
 
-
-
-    document.getElementById('criteria-names-weights-form').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default submission
-
-        let criteriaNames = [];
-        let criteriaWeights = [];
-        let isValid = true;
-
-        // Collect and validate criteria names
-        document.querySelectorAll('input[name="criteria_names[]"]').forEach(function(input) {
-            let name = input.value.trim();
-            if (!name) {
-                alert('Criterion names cannot be empty.');
-                isValid = false;
-                return;
-            }
-            if (criteriaNames.includes(name)) {
-                alert('Criterion names must not be repeated.');
-                isValid = false;
-                return;
-            }
-            criteriaNames.push(name);
-        });
-
-        if (!isValid) return;
-
-        // Collect and validate criteria weights
-        document.querySelectorAll('input[name="criteria_weights[]"]').forEach(function(input) {
-            let weight = parseFloat(input.value);
-            if (isNaN(weight) || weight < 0.01 || weight > 1) {
-                alert('Criterion weights must be between 0.01 and 1.');
-                isValid = false;
-                return;
-            }
-            criteriaWeights.push(weight);
-        });
-
-        if (!isValid) return;
-
-        // Validate the sum of weights
-        let totalWeight = criteriaWeights.reduce((sum, weight) => sum + weight, 0);
-        if (totalWeight !== 1) {
-            alert('The sum of all weights must be equal to 1.');
+    // Collect and validate criteria names
+    document.querySelectorAll('input[name="criteria_names[]"]').forEach(function(input) {
+        let name = input.value.trim();
+        if (!name) {
+            alert('Criterion names cannot be empty.');
+            isValid = false;
             return;
         }
-
-        // If all validations pass, send AJAX request
-        fetch('{{ route("criteria.storeNamesWeights") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}' // CSRF token
-            },
-            body: JSON.stringify({
-                criteria_names: criteriaNames,
-                criteria_weights: criteriaWeights
-            })
-        })
-        .then(response => {
-            if (response.redirected) {
-                window.location.href = response.url;
-            } else {
-                return response.text();
-            }
-        })
-        .then(html => {
-            if (html) {
-                document.open();
-                document.write(html);
-                document.close();
-            }
-        })
-        .catch(error => {
-            alert('An error occurred. Please try again.');
-        });
+        if (criteriaNames.includes(name)) {
+            alert('Criterion names must not be repeated.');
+            isValid = false;
+            return;
+        }
+        criteriaNames.push(name);
     });
 
+    if (!isValid) return;
 
+    // Collect and validate criteria weights
+    document.querySelectorAll('input[name="criteria_weights[]"]').forEach(function(input) {
+        let weight = parseFloat(input.value);
+        if (isNaN(weight) || weight < 0.01 || weight > 1) {
+            alert('Criterion weights must be between 0.01 and 1.');
+            isValid = false;
+            return;
+        }
+        criteriaWeights.push(weight);
+    });
 
+    if (!isValid) return;
 
+    // Validate the sum of weights
+    let totalWeight = criteriaWeights.reduce((sum, weight) => sum + weight, 0);
+    if (totalWeight !== 1) {
+        alert('The sum of all weights must be equal to 1.');
+        return;
+    }
 
+    // Collect intervals
+    document.querySelectorAll('input[name="intervals[]"]').forEach(function(input) {
+        let intervalString = input.value.trim();
+        if (!intervalString) {
+            alert('Intervals cannot be empty.');
+            isValid = false;
+            return;
+        }
+        let intervalArray = intervalString.split(',').map(interval => {
+            let [min, max] = interval.split('-').map(Number);
+            return { min, max };
+        });
+        intervals.push(intervalArray);
+    });
 
+    if (!isValid) return;
 
+    // If all validations pass, send AJAX request
+    fetch('{{ route("criteria.storeNamesWeights") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}' // CSRF token
+        },
+        body: JSON.stringify({
+            criteria_names: criteriaNames,
+            criteria_weights: criteriaWeights,
+            intervals: intervals
+        })
+    })
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            return response.text();
+        }
+    })
+    .then(html => {
+        if (html) {
+            document.open();
+            document.write(html);
+            document.close();
+        }
+    })
+    .catch(error => {
+        alert('An error occurred. Please try again.');
+    });
+});
 
-
-
-/*************************  critera names and weights  ***********************/
+/*************************  criteria names, weights, and intervals  ***********************/
 
 
 

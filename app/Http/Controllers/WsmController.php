@@ -34,23 +34,29 @@ class WsmController extends Controller
         $request->validate([
             'criteria_names' => 'required|array|min:2',
             'criteria_names.*' => 'required|string|distinct',
-            'criteria_weights' => 'required|array|min:1',
-            'criteria_weights.*' => 'required|numeric|min:0.01|max:1',
+            'criteria_weights' => 'required|array',
+            'criteria_weights.*' => 'required|numeric',
+            'intervals' => 'required|array',
+            'intervals.*' => 'required|string|regex:/^(\d+-\d+,)*\d+-\d+$/'
         ]);
 
-        $criteriaNames = $request->input('criteria_names'); // Get the criteria names from the request
-        $criteriaWeights = $request->input('criteria_weights'); // Get the criteria weights from the request
+        $criteriaNames = $request->input('criteria_names');
+        $criteriaWeights = $request->input('criteria_weights');
+        $intervalsInput = $request->input('intervals');
 
-        // Validate the sum of weights
-        $totalWeight = array_sum($criteriaWeights);
-        if ($totalWeight !== 1.0) {
-            return back()->withErrors(['criteria_weights' => 'The sum of all weights must be equal to 1.']);
+        $intervals = [];
+        foreach ($intervalsInput as $intervalString) {
+            $intervals[] = array_map(function ($interval) {
+                list($min, $max) = explode('-', $interval);
+                return ['min' => (float)$min, 'max' => (float)$max];
+            }, explode(',', $intervalString));
         }
 
         // Store the data in the session
         session([
             'criteriaNames' => $criteriaNames,
-            'criteriaWeights' => $criteriaWeights
+            'criteriaWeights' => $criteriaWeights,
+            'intervals' => $intervals
         ]);
 
         // Redirect to the specified view upon success
@@ -61,10 +67,9 @@ class WsmController extends Controller
     {
         $criteriaNames = session('criteriaNames', []);
         $criteriaWeights = session('criteriaWeights', []);
-        return view('wsm.criteria_tables', compact('criteriaNames', 'criteriaWeights'));
+        $intervals = session('intervals', []);
+        return view('wsm.criteria_tables', compact('criteriaNames', 'criteriaWeights', 'intervals'));
     }
-
-    
 
     public function clearSessionData()
     {
@@ -74,44 +79,59 @@ class WsmController extends Controller
         return response()->json(['status' => 'Session data cleared']);
     }
 
-    
     public function storeAlternative(Request $request)
     {
         // Validate the request data
         $request->validate([
-            'alternative_name' => 'required|string',
-            'scores' => 'required|array|min:1',
-            'scores.*' => 'required|numeric|min:0|max:10',
+            'alternative_name' => 'required|string|unique:alternatives,name',
+            'real_values' => 'required|array',
+            'real_values.*' => 'required|numeric'
         ]);
-    
+
         $alternativeName = $request->input('alternative_name');
-        $scores = $request->input('scores');
-    
+        $realValues = $request->input('real_values');
+
         $alternatives = session('alternatives', []);
         $criteriaWeights = session('criteriaWeights', []);
-    
+        $intervals = session('intervals', []);
+
         // Check if the alternative name is unique
         foreach ($alternatives as $alternative) {
             if ($alternative['name'] === $alternativeName) {
                 return back()->withErrors(['alternative_name' => 'The alternative name must be unique.']);
             }
         }
-    
+
+        // Normalize the real-world values
+        $normalizedScores = array_map(function ($value, $interval) {
+            return $this->getScoreFromValue($value, $interval);
+        }, $realValues, $intervals);
+
         // Calculate WSM value
         $wsmValue = 0;
-        foreach ($scores as $index => $score) {
+        foreach ($normalizedScores as $index => $score) {
             $wsmValue += $score * $criteriaWeights[$index];
         }
-    
+
         $alternatives[] = [
             'name' => $alternativeName,
-            'scores' => $scores,
+            'scores' => $normalizedScores,
             'wsm_value' => $wsmValue
         ];
-    
+
         session(['alternatives' => $alternatives]);
-    
+
         return redirect()->route('criteria.tables');
+    }
+
+    private function getScoreFromValue($value, $intervals)
+    {
+        foreach ($intervals as $index => $interval) {
+            if ($value >= $interval['min'] && $value <= $interval['max']) {
+                return $index + 1; // Score is index + 1
+            }
+        }
+        return null; // If value doesn't fit in any interval
     }
 
     public function getBestAlternative()
@@ -121,10 +141,6 @@ class WsmController extends Controller
             return null;
         }
 
-        usort($alternatives, function ($a, $b) {
-            return $b['wsm_value'] <=> $a['wsm_value'];
-        });
-
-        return $alternatives[0];
+        return collect($alternatives)->sortByDesc('wsm_value')->first();
     }
 }

@@ -15,6 +15,7 @@
                 <tr>
                     <th>Criteria</th>
                     <th>Weight</th>
+                    <th>Intervals</th>
                 </tr>
             </thead>
             <tbody>
@@ -22,6 +23,11 @@
                     <tr>
                         <td>{{ $name }}</td>
                         <td>{{ $criteriaWeights[$index] }}</td>
+                        <td>
+                            @foreach($intervals[$index] as $interval)
+                                {{ $interval['min'] }}-{{ $interval['max'] }}<br>
+                            @endforeach
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
@@ -77,8 +83,8 @@
                         </div>
                         @foreach($criteriaNames as $index => $name)
                             <div class="form-group">
-                                <label for="score_{{ $index }}">{{ $name }} Score</label>
-                                <input type="number" class="form-control" id="score_{{ $index }}" name="scores[]" min="0" max="10" required>
+                                <label for="real_value_{{ $index }}">{{ $name }} Real Value</label>
+                                <input type="number" class="form-control" id="real_value_{{ $index }}" name="real_values[]" required>
                             </div>
                         @endforeach
                     </div>
