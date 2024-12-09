@@ -25,4 +25,8 @@ Route::middleware('auth:admin')->group(function () {
 
     // Route to store an alternative
     Route::post('/store-alternative', [WsmController::class, 'storeAlternative'])->name('store.alternative');
+
+    // Route to clear session data
+    Route::post('/clear-session-data', [WsmController::class, 'clearSessionData'])->name('clear.session.data');
+    
 });

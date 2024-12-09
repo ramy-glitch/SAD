@@ -98,6 +98,10 @@
         document.getElementById('add-alternative-btn').addEventListener('click', function() {
             $('#add-alternative-modal').modal('show');
         });
+
+        window.addEventListener('beforeunload', function (e) {
+            navigator.sendBeacon('{{ route('clear.session.data') }}');
+        });
     </script>
 </body>
 </html>
