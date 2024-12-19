@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
 
 class WsmController extends Controller
 {
@@ -44,6 +45,11 @@ class WsmController extends Controller
         $criteriaWeights = $request->input('criteria_weights');
         $intervalsInput = $request->input('intervals');
 
+        // Debugging statements
+        Log::debug('Criteria Names:', $criteriaNames);
+        Log::debug('Criteria Weights:', $criteriaWeights);
+        Log::debug('Intervals Input:', $intervalsInput);
+
         $intervals = [];
         foreach ($intervalsInput as $intervalString) {
             $intervals[] = array_map(function ($interval) {
@@ -51,6 +57,9 @@ class WsmController extends Controller
                 return ['min' => (float)$min, 'max' => (float)$max];
             }, explode(',', $intervalString));
         }
+
+        // Debugging statement
+        Log::debug('Parsed Intervals:', $intervals);
 
         // Store the data in the session
         session([
