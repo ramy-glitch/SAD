@@ -28,5 +28,7 @@ Route::middleware('auth:admin')->group(function () {
 
     // Route to clear session data
     Route::post('/clear-session-data', [WsmController::class, 'clearSessionData'])->name('clear.session.data');
-    
+
+        // Define the missing route
+        Route::post('/store/criteria', [WsmController::class, 'storeCriteriaNamesWeights'])->name('store.criteria');
 });

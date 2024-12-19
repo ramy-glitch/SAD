@@ -48,7 +48,7 @@ class WsmController extends Controller
             'criteria_weights' => 'required|array',
             'criteria_weights.*' => 'required|numeric',
             'intervals' => 'required|array',
-            'intervals.*' => 'required|array|size:8',
+            'intervals.*' => 'required|array|size:9', // 1 min + 8 max values
             'intervals.*.*' => 'required|numeric'
         ]);
 
@@ -65,16 +65,19 @@ class WsmController extends Controller
         $intervals = [];
         foreach ($intervalsInput as $intervalGroup) {
             $parsedIntervals = [];
-            for ($i = 0; $i < count($intervalGroup); $i += 2) {
+            $min = (float)$intervalGroup[0]; // First min value
+            for ($i = 1; $i < count($intervalGroup); $i++) {
+                $max = (float)$intervalGroup[$i];
                 $parsedIntervals[] = [
-                    'min' => (float)$intervalGroup[$i],
-                    'max' => (float)$intervalGroup[$i + 1]
+                    'min' => $min,
+                    'max' => $max
                 ];
+                $min = $max; // Set the next min to the current max
             }
             $intervals[] = $parsedIntervals;
         }
 
-        
+        Log::debug('Parsed Intervals:', $intervals);
 
         // Store the criteria data in the session
         session([

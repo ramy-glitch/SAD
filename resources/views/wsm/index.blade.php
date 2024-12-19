@@ -94,16 +94,24 @@ document.getElementById('criteria-names-weights-form').addEventListener('submit'
     }
 
     // Collect intervals
-    document.querySelectorAll('input[name="intervals[]"]').forEach(function(input) {
-        let intervalString = input.value.trim();
-        if (!intervalString) {
-            alert('Intervals cannot be empty.');
-            isValid = false;
-            return;
-        }
-        let intervalArray = intervalString.split(',').map(interval => {
-            let [min, max] = interval.split('-').map(Number);
-            return { min, max };
+    document.querySelectorAll('[id^="intervals_"]').forEach(function(intervalGroup) {
+        let intervalArray = [];
+        let min = null;
+        intervalGroup.querySelectorAll('input').forEach(function(input, index) {
+            let value = parseFloat(input.value);
+            if (isNaN(value)) {
+                alert('Interval values must be numeric.');
+                isValid = false;
+                return;
+            }
+            if (index % 2 === 0) {
+                // Min value
+                min = value;
+            } else {
+                // Max value
+                intervalArray.push({ min: min, max: value });
+                min = value; // Set the next min to the current max
+            }
         });
         intervals.push(intervalArray);
     });
