@@ -48,7 +48,8 @@ class WsmController extends Controller
             'criteria_weights' => 'required|array',
             'criteria_weights.*' => 'required|numeric',
             'intervals' => 'required|array',
-            'intervals.*' => 'required|string|regex:/^(\d+-\d+,)*\d+-\d+$/'
+            'intervals.*' => 'required|array|size:8',
+            'intervals.*.*' => 'required|numeric'
         ]);
 
         // Retrieve input data from the request
@@ -56,27 +57,24 @@ class WsmController extends Controller
         $criteriaWeights = $request->input('criteria_weights');
         $intervalsInput = $request->input('intervals');
 
-        // Log the input data for debugging purposes
         Log::debug('Criteria Names:', $criteriaNames);
         Log::debug('Criteria Weights:', $criteriaWeights);
         Log::debug('Intervals Input:', $intervalsInput);
 
         // Parse the intervals input into a structured array
         $intervals = [];
-        foreach ($intervalsInput as $intervalString) {
-            // Split each interval string into individual intervals
-            $intervals[] = array_map(function ($interval) {
-                // Split each interval into minimum and maximum values
-                list($min, $max) = explode('-', $interval);
-                return [
-                    'min' => (float)$min,
-                    'max' => (float)$max
+        foreach ($intervalsInput as $intervalGroup) {
+            $parsedIntervals = [];
+            for ($i = 0; $i < count($intervalGroup); $i += 2) {
+                $parsedIntervals[] = [
+                    'min' => (float)$intervalGroup[$i],
+                    'max' => (float)$intervalGroup[$i + 1]
                 ];
-            }, explode(',', $intervalString));
+            }
+            $intervals[] = $parsedIntervals;
         }
 
-        // Log the parsed intervals for debugging
-        Log::debug('Parsed Intervals:', $intervals);
+        
 
         // Store the criteria data in the session
         session([
