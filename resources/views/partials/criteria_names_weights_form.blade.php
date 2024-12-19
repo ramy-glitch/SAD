@@ -15,12 +15,12 @@
             <label for="intervals_{{ $i }}">Enter intervals for criterion {{ $i }}:</label>
             <div id="intervals_{{ $i }}">
                 <div class="interval-group">
-                    <input type="text" name="intervals[{{ $i }}][]" placeholder="Min" required>
-                    <input type="text" name="intervals[{{ $i }}][]" placeholder="Max" required>
+                    <input type="text" name="intervals[{{ $i }}][]" placeholder="Min" Value="10" required>
+                    <input type="text" name="intervals[{{ $i }}][]" placeholder="Max" Value="20" required>
                 </div>
                 @for ($j = 2; $j <= 8; $j++)
                     <div class="interval-group">
-                        <input type="text" name="intervals[{{ $i }}][]" placeholder="Max" required>
+                        <input type="text" name="intervals[{{ $i }}][]" placeholder="Max" Value="{{$j}}00" required>
                     </div>
                 @endfor
             </div>
