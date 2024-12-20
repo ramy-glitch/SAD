@@ -20,14 +20,8 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('wsm/number-of-criteria', [WsmController::class, 'criteriaNum'])->name('criteria.submit');
     Route::post('wsm/names-weights-of-criteria', [WsmController::class, 'storeCriteriaNamesWeights'])->name('store.criteria.names.weights');
 
-    //Route::post('wsm/names-weights-of-criteria', [WsmController::class, 'storeCriteriaNamesWeights'])->name('criteria.storeNamesWeights');
-    // Route to display the criteria tables view
-    //Route::get('/criteria/tables', [WsmController::class, 'criteriaTables'])->name('criteria.tables');
+    Route::get('/criteria/tables', [WsmController::class, 'showCriteriaTables'])->name('criteria.tables');
 
-    // Route to store an alternative
     Route::post('/store-alternative', [WsmController::class, 'storeAlternative'])->name('store.alternative');
-
-    // Route to clear session data
     Route::post('/clear-session-data', [WsmController::class, 'clearSessionData'])->name('clear.session.data');
-
 });

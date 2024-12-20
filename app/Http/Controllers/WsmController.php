@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 // Import necessary classes
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
 
 // Define the controller class
 class WsmController extends Controller
@@ -50,14 +51,12 @@ class WsmController extends Controller
             'intervals.*' => 'required|array|size:9', // 1 min + 8 max values
             'intervals.*.*' => 'required|numeric'
         ]);
-
+    
         // Retrieve input data from the request
         $criteriaNames = $request->input('criteria_names');
         $criteriaWeights = $request->input('criteria_weights');
         $intervalsInput = $request->input('intervals');
-
-
-
+    
         // Parse the intervals input into a structured array
         $intervals = [];
         foreach ($intervalsInput as $intervalGroup) {
@@ -73,31 +72,38 @@ class WsmController extends Controller
             }
             $intervals[] = $parsedIntervals;
         }
-
-        
-
+    
         // Store the criteria data in the session
         session([
             'criteriaNames' => $criteriaNames,
             'criteriaWeights' => $criteriaWeights,
             'intervals' => $intervals
         ]);
+    
+        // Log the response data
+        \Log::info('Criteria Names:', $criteriaNames);
+        \Log::info('Criteria Weights:', $criteriaWeights);
+        \Log::info('Intervals:', $intervals);
+    
 
-        // Return a JSON response indicating success
-        return view('wsm.criteria_tables', compact('criteriaNames', 'criteriaWeights', 'intervals'));
+        // Redirect to the criteria tables route
+        return redirect()->route('criteria.tables');
     }
 
-    /*// Display the criteria tables view
-    public function criteriaTables()
+    // Display the criteria tables view
+    public function showCriteriaTables()
     {
-        // Retrieve criteria data from the session
+        Log::info('Showing criteria tables');
+        // Retrieve data from the session
         $criteriaNames = session('criteriaNames', []);
         $criteriaWeights = session('criteriaWeights', []);
         $intervals = session('intervals', []);
 
-        // Pass the data to the view
+        // Return the criteria tables view with the data
         return view('wsm.criteria_tables', compact('criteriaNames', 'criteriaWeights', 'intervals'));
-    }*/
+    }
+
+
 
     // Clear session data related to alternatives
     public function clearSessionData()
