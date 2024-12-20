@@ -17,8 +17,8 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('criteria-form').addEventListener('submit', function(event) {
+        document.addEventListener('DOMContentLoaded', function() { // until the page is fully loaded
+            document.getElementById('criteria-form').addEventListener('submit', function(event) { // Add event listener for the form
                 event.preventDefault(); // Prevent default submission
                 let criteria = document.getElementById('criteria').value;
 
@@ -32,7 +32,7 @@
                 document.getElementById('dynamic-content').innerHTML = '<p>Loading...</p>';
 
                 // Send the request
-                fetch('{{ route("criteria.submit") }}', {
+                fetch('{{ route("criteria.submit") }}', { 
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -70,7 +70,11 @@
                                 criteriaNames.push(name);
                             });
 
-                            if (!isValid) return;
+
+                            if (!isValid) {
+                                return;
+                            }
+                            
 
                             // Collect and validate criteria weights
                             document.querySelectorAll('input[name="criteria_weights[]"]').forEach(function(input) {
@@ -83,39 +87,40 @@
                                 criteriaWeights.push(weight);
                             });
 
-                            if (!isValid) return;
-
-                            // Validate the sum of weights
-                            let totalWeight = criteriaWeights.reduce((sum, weight) => sum + weight, 0);
-                            if (totalWeight !== 1) {
-                                alert('The sum of all weights must be equal to 1.');
-                                return;
-                            }
+                            
 
                             // Collect intervals
                             document.querySelectorAll('[id^="intervals_"]').forEach(function(intervalGroup) {
+                                // Array to store intervals for the current group
                                 let intervalArray = [];
+                                // Variable to hold the minimum value of an interval
                                 let min = null;
+                                // Select all input elements within the current interval group
                                 intervalGroup.querySelectorAll('input').forEach(function(input, index) {
+                                    // Convert the input value to a floating-point number
                                     let value = parseFloat(input.value);
+                                    // Check if the value is not a number
                                     if (isNaN(value)) {
                                         alert('Interval values must be numeric.');
                                         isValid = false;
                                         return;
                                     }
+                                    // If the index is even, it's a minimum value
                                     if (index % 2 === 0) {
-                                        // Min value
                                         min = value;
                                     } else {
-                                        // Max value
+                                        // If the index is odd, it's a maximum value
+                                        // Push the interval object to the intervalArray
                                         intervalArray.push({ min: min, max: value });
-                                        min = value; // Set the next min to the current max
+                                        // Set the next min to the current max
+                                        min = value;
                                     }
                                 });
+                                // Add the intervalArray to the intervals array
                                 intervals.push(intervalArray);
                             });
 
-                            //if (!isValid) return;
+                            
 
                             // If all validations pass, send AJAX request
                             fetch('{{ route("store.criteria.names.weights") }}', {

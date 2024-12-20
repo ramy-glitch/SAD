@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 // Import necessary classes
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Log;
 
 // Define the controller class
 class WsmController extends Controller
@@ -57,9 +56,7 @@ class WsmController extends Controller
         $criteriaWeights = $request->input('criteria_weights');
         $intervalsInput = $request->input('intervals');
 
-        Log::debug('Criteria Names:', $criteriaNames);
-        Log::debug('Criteria Weights:', $criteriaWeights);
-        Log::debug('Intervals Input:', $intervalsInput);
+
 
         // Parse the intervals input into a structured array
         $intervals = [];
@@ -77,7 +74,7 @@ class WsmController extends Controller
             $intervals[] = $parsedIntervals;
         }
 
-        Log::debug('Parsed Intervals:', $intervals);
+        
 
         // Store the criteria data in the session
         session([

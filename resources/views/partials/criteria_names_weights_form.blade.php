@@ -12,7 +12,7 @@
             <input type="text" id="criteria_weight_{{ $i }}" name="criteria_weights[]" required>
         </div>
         <div class="form-group">
-            <label for="intervals_{{ $i }}">Enter intervals for criterion {{ $i }}:</label>
+            <label>Enter intervals for criterion {{ $i }}:</label>
             <div id="intervals_{{ $i }}">
                 <div class="interval-group">
                     <input type="text" name="intervals[{{ $i }}][]" placeholder="Min" Value="10" required>
