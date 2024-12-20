@@ -40,8 +40,12 @@ function validateCriteriaWeights(criteriaWeights) {
 
 function validateIntervals(intervals) {
     for (let group of intervals) {
-        for (let interval of group) {
-            if (isNaN(interval.min) || isNaN(interval.max)) {
+        if (group.length !== 10) {
+            alert('Each interval group must contain exactly 10 values.');
+            return false;
+        }
+        for (let value of group) {
+            if (isNaN(value)) {
                 alert('Interval values must be numeric.');
                 return false;
             }

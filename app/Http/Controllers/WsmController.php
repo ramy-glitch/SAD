@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 // Import necessary classes
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+
 
 // Define the controller class
 class WsmController extends Controller
@@ -41,37 +42,45 @@ class WsmController extends Controller
     // Store criteria names, weights, and intervals
     public function storeCriteriaNamesWeights(Request $request)
     {
-        // Validate the request data
-        $request->validate([
-            'criteria_names' => 'required|array|min:2',
-            'criteria_names.*' => 'required|string|distinct',
-            'criteria_weights' => 'required|array',
-            'criteria_weights.*' => 'required|numeric',
-            'intervals' => 'required|array',
-            'intervals.*' => 'required|array|size:9', // 1 min + 8 max values
-            'intervals.*.*' => 'required|numeric'
-        ]);
+    // Validate the request data
+    $validator = \Validator::make($request->all(), [
+        'criteria_names' => 'required|array|min:2',
+        'criteria_names.*' => 'required|string|distinct',
+        'criteria_weights' => 'required|array',
+        'criteria_weights.*' => 'required|numeric',
+        'intervals' => 'required|array',
+        'intervals.*' => 'required|array|size:10', 
+        'intervals.*.*' => 'required|numeric'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
     
         // Retrieve input data from the request
         $criteriaNames = $request->input('criteria_names');
         $criteriaWeights = $request->input('criteria_weights');
         $intervalsInput = $request->input('intervals');
     
-        // Parse the intervals input into a structured array
-        $intervals = [];
-        foreach ($intervalsInput as $intervalGroup) {
-            $parsedIntervals = [];
-            $min = (float)$intervalGroup[0]; // First min value
-            for ($i = 1; $i < count($intervalGroup); $i++) {
-                $max = (float)$intervalGroup[$i];
-                $parsedIntervals[] = [
-                    'min' => $min,
-                    'max' => $max
-                ];
-                $min = $max; // Set the next min to the current max
-            }
-            $intervals[] = $parsedIntervals;
-        }
+// Parse the intervals input into a structured array
+$intervals = array_map(function($intervalGroup) {
+    $parsedIntervals = [];
+    for ($i = 0; $i < count($intervalGroup) - 1; $i++) {
+        $parsedIntervals[] = [
+            'min' => (float)$intervalGroup[$i],
+            'max' => (float)$intervalGroup[$i + 1]
+        ];
+    }
+    return $parsedIntervals;
+}, $intervalsInput);
+
+// Store the criteria data in the session
+session([
+    'criteriaNames' => $criteriaNames,
+    'criteriaWeights' => $criteriaWeights,
+    'intervals' => $intervals
+]);
     
         // Store the criteria data in the session
         session([
@@ -80,10 +89,7 @@ class WsmController extends Controller
             'intervals' => $intervals
         ]);
     
-        // Log the response data
-        \Log::info('Criteria Names:', $criteriaNames);
-        \Log::info('Criteria Weights:', $criteriaWeights);
-        \Log::info('Intervals:', $intervals);
+
     
 
         // Redirect to the criteria tables route
@@ -93,7 +99,7 @@ class WsmController extends Controller
     // Display the criteria tables view
     public function showCriteriaTables()
     {
-        Log::info('Showing criteria tables');
+        
         // Retrieve data from the session
         $criteriaNames = session('criteriaNames', []);
         $criteriaWeights = session('criteriaWeights', []);
@@ -120,7 +126,7 @@ class WsmController extends Controller
     {
         // Validate the request data
         $request->validate([
-            'alternative_name' => 'required|string|unique:alternatives,name',
+            'alternative_name' => 'required|string',
             'real_values' => 'required|array',
             'real_values.*' => 'required|numeric'
         ]);

@@ -39,11 +39,9 @@ function attachCriteriaFormListener() {
             const criteriaWeights = Array.from(document.querySelectorAll('input[name="criteria_weights[]"]')).map(input => parseFloat(input.value));
             const intervals = Array.from(document.querySelectorAll('[id^="intervals_"]')).map(group => {
                 const intervalArray = [];
-                let min = null;
-                group.querySelectorAll('input').forEach((input, index) => {
+                group.querySelectorAll('input').forEach(input => {
                     const value = parseFloat(input.value);
-                    if (index % 2 === 0) min = value;
-                    else intervalArray.push({ min, max: value });
+                    intervalArray.push(value);
                 });
                 return intervalArray;
             });
@@ -60,23 +58,29 @@ function attachCriteriaFormListener() {
             try {
                 const response = await sendCriteriaDetails(criteriaNames, criteriaWeights, intervals);
                 console.log('Response:', response);
+                if (response.status === 422) {
+                    const data = await response.json();
+                    console.error('Validation errors:', data.errors);
+                    alert('Validation errors occurred. Please check your input.');
+                    return;
+                }
+
                 if (response.redirected) {
                     console.log('Redirecting to:', response.url);
                     window.location.href = response.url;
                 } else {
                     const html = await response.text();
                     console.log('Received HTML content:', html);
-                    document.open();
-                    document.write(html);
-                    document.close();
+                    document.getElementById('dynamic-content').innerHTML = html;
                 }
             } catch (error) {
                 console.error('Error details:', error);
                 alert('An error occurred. Please try again.');
             }
-            
         });
     } else {
         console.error('Criteria names and weights form not found');
     }
 }
+
+
