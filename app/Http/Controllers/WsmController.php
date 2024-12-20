@@ -83,11 +83,11 @@ class WsmController extends Controller
             'intervals' => $intervals
         ]);
 
-        // Redirect to the criteria tables route
-        return redirect()->route('criteria.tables');
+        // Return a JSON response indicating success
+        return view('wsm.criteria_tables', compact('criteriaNames', 'criteriaWeights', 'intervals'));
     }
 
-    // Display the criteria tables view
+    /*// Display the criteria tables view
     public function criteriaTables()
     {
         // Retrieve criteria data from the session
@@ -97,7 +97,7 @@ class WsmController extends Controller
 
         // Pass the data to the view
         return view('wsm.criteria_tables', compact('criteriaNames', 'criteriaWeights', 'intervals'));
-    }
+    }*/
 
     // Clear session data related to alternatives
     public function clearSessionData()
