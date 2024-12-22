@@ -102,37 +102,80 @@ class WsmController extends Controller
         }
     
 
-    // Display the criteria tables view
-    public function showCriteriaTables(Request $request)
-    {
-        // Retrieve all criteria data for the authenticated user
-        $wsmData = WsmData::where('user_id', auth()->id())->get();
 
-        // Extract the problem names from the criteria data
-        $problemNames = $wsmData->map(function ($data) {
-            return $data->criteria_data['problem_name'];
-        })->unique();
+// Display the criteria tables view
+public function showCriteriaTables(Request $request)
+{
+    // Retrieve all criteria data for the authenticated user
+    $wsmData = WsmData::where('user_id', auth()->id())->get();
 
-        // Get the selected problem name from the request
-        $selectedProblemName = $request->input('problem_name');
+    // Extract the problem names from the criteria data
+    $problemNames = $wsmData->map(function ($data) {
+        return $data->criteria_data['problem_name'];
+    })->unique();
 
-        // Retrieve the criteria data for the selected problem name
-        $selectedData = $wsmData->firstWhere('criteria_data->problem_name', $selectedProblemName);
-
-        if ($selectedData) {
-            $criteriaData = $selectedData->criteria_data;
-            $criteriaNames = $criteriaData['criteria_names'];
-            $criteriaWeights = $criteriaData['criteria_weights'];
-            $intervals = $criteriaData['intervals'];
-        } else {
-            $criteriaNames = [];
-            $criteriaWeights = [];
-            $intervals = [];
-        }
-
-        // Return the criteria tables view with the data
-        return view('wsm.criteria_tables', compact('problemNames', 'criteriaNames', 'criteriaWeights', 'intervals', 'selectedProblemName'));
+    // if there is no criteria data in the session 
+    if (!session('criteriaNames')) {
+        
+        
+        $criteriaNames = [];
+        $criteriaWeights = [];
+        $intervals = [];
+        
+    } else {
+        // Retrieve the criteria data from the session
+        $criteriaNames = session('criteriaNames');
+        $criteriaWeights = session('criteriaWeights');
+        $intervals = session('intervals');
     }
+
+
+    return view('wsm.criteria_tables', compact('problemNames', 'criteriaNames', 'criteriaWeights', 'intervals'));
+}
+
+// Display criteria tables for a selected problem
+public function showCriteriaTablesProblem(Request $request)
+{
+    // Retrieve all criteria data for the authenticated user
+    $wsmData = WsmData::where('user_id', auth()->id())->get();
+
+    // Extract the problem names from the criteria data
+    $problemNames = $wsmData->map(function ($data) {
+        return $data->criteria_data['problem_name'];
+    })->unique();
+
+    // Get the selected problem name from the request
+    $selectedProblemName = $request->input('problem_name');
+
+    // Retrieve the criteria data for the selected problem name
+    $selectedData = $wsmData->first(function ($data) use ($selectedProblemName) {
+        return $data->criteria_data['problem_name'] === $selectedProblemName;
+    });
+
+    if ($selectedData) {
+        $criteriaData = $selectedData->criteria_data;
+        $criteriaNames = $criteriaData['criteria_names'];
+        $criteriaWeights = $criteriaData['criteria_weights'];
+        $intervals = $criteriaData['intervals'];
+
+        // forget the criteria data in the session
+        session()->forget(['criteriaNames', 'criteriaWeights', 'intervals']);
+        // Store the criteria data in the session
+        session([
+            'criteriaNames' => $criteriaNames,
+            'criteriaWeights' => $criteriaWeights,
+            'intervals' => $intervals
+        ]);
+
+    } else {
+        $criteriaNames = [];
+        $criteriaWeights = [];
+        $intervals = [];
+    }
+
+    // Return the criteria tables view with the data
+    return view('wsm.criteria_tables', compact('problemNames', 'criteriaNames', 'criteriaWeights', 'intervals', 'selectedProblemName'));
+}
 
 
 

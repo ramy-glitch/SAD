@@ -22,6 +22,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('wsm/names-weights-of-criteria', [WsmController::class, 'storeCriteriaNamesWeights'])->name('store.criteria.names.weights');
 
     Route::get('/criteria/tables', [WsmController::class, 'showCriteriaTables'])->name('criteria.tables');
+    Route::post('/criteria/tables/problem', [WsmController::class, 'showCriteriaTablesProblem'])->name('criteria.tables.problem');
 
     Route::post('/store-alternative', [WsmController::class, 'storeAlternative'])->name('store.alternative');
     Route::post('/clear-session-data', [WsmController::class, 'clearSessionData'])->name('clear.session.data');

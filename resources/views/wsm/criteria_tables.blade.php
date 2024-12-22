@@ -11,16 +11,20 @@
     <div class="container">
 
     <h2>Select Problem</h2>
-        <form action="{{ route('criteria.tables') }}" method="GET">
+        <form action="{{ route('criteria.tables.problem') }}" method="POST">
+            @csrf
             <div class="form-group">
                 <label for="problem_name">Problem Name</label>
-                <select name="problem_name" id="problem_name" class="form-control" onchange="this.form.submit()">
+                <select name="problem_name" id="problem_name" class="form-control">
                     <option value="">Select a problem</option>
                     @foreach($problemNames as $name)
-                        <option value="{{ $name }}" {{ request('problem_name') == $name ? 'selected' : '' }}>{{ $name }}</option>
+                        <option value="{{ $name }}" {{ isset($selectedProblemName) && $selectedProblemName === $name ? 'selected' : '' }}>
+                            {{ $name }}
+                        </option>
                     @endforeach
                 </select>
             </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
 
         @if(isset($criteriaNames) && !empty($criteriaNames))
