@@ -181,9 +181,9 @@ public function showCriteriaTablesProblem(Request $request)
 
     // Clear session data related to alternatives
     public function clearSessionData()
-    {
+    { 
         // Forget the 'alternatives' data in the session
-        Session::forget(['alternatives']);
+        Session::forget(['alternatives', 'criteriaNames', 'criteriaWeights', 'intervals']);
     
         // Return a JSON response indicating success
         return response()->json(['status' => 'Session data cleared']);
@@ -271,4 +271,34 @@ public function showCriteriaTablesProblem(Request $request)
         // Sort alternatives by WSM value in descending order and return the first one
         return collect($alternatives)->sortByDesc('wsm_value')->first();
     }
+
+
+    public function showProblemParams(Request $request)
+{
+    // Retrieve all criteria data for the authenticated user
+    $wsmData = WsmData::where('user_id', auth()->id())->get();
+
+    // Extract the problem names from the criteria data
+    $problemNames = $wsmData->map(function ($data) {
+        return $data->criteria_data['problem_name'];
+    })->unique();
+
+    // if there is no criteria data in the session 
+    if (!session('criteriaNames')) {
+        
+        
+        $criteriaNames = [];
+        $criteriaWeights = [];
+        $intervals = [];
+        
+    } else {
+        // Retrieve the criteria data from the session
+        $criteriaNames = session('criteriaNames');
+        $criteriaWeights = session('criteriaWeights');
+        $intervals = session('intervals');
+    }
+
+
+    return view('problemsPram.index', compact('problemNames', 'criteriaNames', 'criteriaWeights', 'intervals'));
+}
 }

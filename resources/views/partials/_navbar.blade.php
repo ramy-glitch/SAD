@@ -24,6 +24,8 @@
 <div class="navbar">
     <a href="{{ route('admin.logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
     <a href="{{ route('criteria.tables') }}">Criteria Tables</a>
+    <a href="{{ route('problem.params') }}">Edit Problems Parameters</a>
+    <a href="{{ route('wsm.index') }}">Add New Problem</a>
     <a href="{{ route('admin.dashboard') }}">Home</a>
 </div>
 

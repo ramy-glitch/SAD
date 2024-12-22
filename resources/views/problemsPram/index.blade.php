@@ -7,57 +7,67 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>WSM Page</title>
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/wsmforms.css') }}">
-
+    <link rel="stylesheet" href="{{ asset('css/problemParam.css') }}">
 </head>
 <body>
 @include('partials._navbar')
-    <h1>Welcome to the WSM Page</h1>
-
     <div class="container">
-        <h2>Select a Problem or Create a New One</h2>
-        <div class="problem-list">
-            <h3>Choose a Problem</h3>
-            @include('partials._chooseProblem')
-        </div>
-        <div class="create-problem">
-            <h3>Create a New Problem</h3>
 
-            @include('partials._problemNameNumCriteria')
+    <h2>Select Problem</h2>
+        <form action="#" method="POST">
+            @csrf
+            <div class="form-group">
+                <label for="problem_name">Problem Name</label>
+                <select name="problem_name" id="problem_name" class="form-control">
+                    <option value="">Select a problem</option>
+                    @foreach($problemNames as $name)
+                        <option value="{{ $name }}" {{ isset($selectedProblemName) && $selectedProblemName === $name ? 'selected' : '' }}>
+                            {{ $name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
 
-        </div>
+        @if(isset($criteriaNames) && !empty($criteriaNames))
+
+            <form id="edit-problem-form">
+                @csrf
+                @foreach($criteriaNames as $index => $name)
+                    <div class="form-group">
+                        <label for="criteria_name_{{ $index }}">Edit name for criterion {{ $index+1 }}:</label>
+                        <input type="text" id="criteria_name_{{ $index }}" name="criteria_names[]" value="{{ $name }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="criteria_weight_{{ $index }}">Edit weight for criterion {{ $index+1 }}:</label>
+                        <input type="text" id="criteria_weight_{{ $index }}" name="criteria_weights[]" value="{{ $criteriaWeights[$index] }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="intervals_{{ $index }}">Edit intervals for criterion {{ $index+1 }}:</label>
+                        <div id="intervals_{{ $index }}">
+                            <div class="interval-group">
+                                <input type="text" name="intervals[{{ $index }}][]" value="{{ $intervals[$index][0]['min'] }}" placeholder="1">
+                                @foreach($intervals[$index] as $interval)
+                                    <input type="text" name="intervals[{{ $index }}][]" value="{{ $interval['max'] }}" placeholder="{{ $loop->iteration + 1 }}">
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+                <button type="submit">Submit</button>
+            </form>
+
+            <h2>delete problem</h2>
+
+            <form id="delete-problem-form">
+                @csrf
+                <button type="submit">Delete Problem</button>
+            </form>
+        @endif
+
     </div>
 
-    <script>
-
-        document.getElementById('list-problems-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            var problem = document.getElementById('problem').value;
-            window.location.href = '/problems/' + problem;
-        });
-
-        document.getElementById('problem-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            var problemName = document.getElementById('problem-name').value;
-            var criteria = document.getElementById('criteria').value;
-
-            fetch('/problems/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    problem_name: problemName,
-                    criteria: criteria
-                })
-            })
-            .then(response => response.text())
-            .then(data => {
-                document.querySelector('.create-problem').innerHTML = data;
-            })
-            .catch(error => console.error('Error:', error));
-        });
-
+    
 </body>
 </html>
