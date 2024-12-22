@@ -1,11 +1,11 @@
-async function sendCriteria(criteria) {
+async function sendCriteria(problemName, criteria) {
     const response = await fetch(window.Laravel.routes.criteriaSubmit, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': window.Laravel.csrfToken
         },
-        body: JSON.stringify({ criteria })
+        body: JSON.stringify({ problem_name: problemName, criteria })
     });
     return response.json();
 }

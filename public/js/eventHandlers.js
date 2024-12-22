@@ -5,13 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             console.log('Criteria form submitted');
 
+            const problemName = document.getElementById('problem-name').value;
             const criteria = document.getElementById('criteria').value;
             if (!validateCriteriaInput(criteria)) return;
 
             document.getElementById('dynamic-content').innerHTML = '<p>Loading...</p>';
 
             try {
-                const data = await sendCriteria(criteria);
+                const data = await sendCriteria(problemName, criteria);
                 if (data.html) {
                     document.getElementById('dynamic-content').innerHTML = data.html;
                     attachCriteriaFormListener();

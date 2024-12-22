@@ -15,7 +15,9 @@
             font-weight: bold;
         }
 
-        #criteria-form input[type="number"], #criteria-names-weights-form input[type="text"], #criteria-names-weights-form input[type="number"] {
+        #criteria-form input[type="number"], 
+        input[type="text"],
+        #criteria-names-weights-form input[type="text"], #criteria-names-weights-form input[type="number"] {
             width: 80%;
             padding: 10px;
             margin-bottom: 20px;

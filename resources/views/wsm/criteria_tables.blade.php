@@ -9,32 +9,51 @@
 <body>
 @include('partials._navbar')
     <div class="container">
-        <h2>Criteria and Weights</h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Criteria</th>
-                    <th>Weight</th>
-                    <th>Intervals</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($criteriaNames as $index => $name)
+
+    <h2>Select Problem</h2>
+        <form action="{{ route('criteria.tables') }}" method="GET">
+            <div class="form-group">
+                <label for="problem_name">Problem Name</label>
+                <select name="problem_name" id="problem_name" class="form-control" onchange="this.form.submit()">
+                    <option value="">Select a problem</option>
+                    @foreach($problemNames as $name)
+                        <option value="{{ $name }}" {{ request('problem_name') == $name ? 'selected' : '' }}>{{ $name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </form>
+
+        @if(isset($criteriaNames) && !empty($criteriaNames))
+            <h2>Criteria and Weights</h2>
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>{{ $name }}</td>
-                        <td>{{ $criteriaWeights[$index] }}</td>
-                        <td>
-                            @foreach($intervals[$index] as $interval)
-                                {{ $interval['min'] }}-{{ $interval['max'] }}<br>
-                            @endforeach
-                        </td>
+                        <th>Criteria</th>
+                        <th>Weight</th>
+                        <th>Intervals</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach($criteriaNames as $index => $name)
+                        <tr>
+                            <td>{{ $name }}</td>
+                            <td>{{ $criteriaWeights[$index] }}</td>
+                            <td>
+                                @foreach($intervals[$index] as $interval)
+                                    {{ $interval['min'] }}-{{ $interval['max'] }}<br>
+                                @endforeach
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
 
         <h2>Alternatives</h2>
-        <button id="add-alternative-btn" class="btn btn-primary">Add Alternative</button>
+        <div class="mb-3">
+            <button id="add-alternative-btn" class="btn btn-primary">Add Alternative</button>
+            <button id="clear-table-btn" class="btn btn-danger ml-2">Clear Table</button>
+        </div>
         <table class="table">
             <thead>
                 <tr>
@@ -105,16 +124,24 @@
             $('#add-alternative-modal').modal('show');
         });
 
-        window.addEventListener('beforeunload', function (e) {
-            $.ajax({
-                type: 'POST',
-                url: '{{ route('clear.session.data') }}',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                async: false
-            });
+        document.getElementById('clear-table-btn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all alternatives?')) {
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ route('clear.session.data') }}',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function() {
+                        location.reload();
+                    },
+                    error: function() {
+                        alert('Error clearing the table. Please try again.');
+                    }
+                });
+            }
         });
+
     </script>
 </body>
 </html>
