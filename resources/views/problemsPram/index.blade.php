@@ -14,7 +14,7 @@
     <div class="container">
 
     <h2>Select Problem</h2>
-        <form action="#" method="POST">
+        <form action="{{ route('show.Selected.problem') }}" method="POST">
             @csrf
             <div class="form-group">
                 <label for="problem_name">Problem Name</label>
@@ -32,7 +32,7 @@
 
         @if(isset($criteriaNames) && !empty($criteriaNames))
 
-            <form id="edit-problem-form">
+            <form id="edit-problem-form" action="{{ route('problem.update') }}" method="POST">
                 @csrf
                 @foreach($criteriaNames as $index => $name)
                     <div class="form-group">
@@ -55,19 +55,25 @@
                         </div>
                     </div>
                 @endforeach
+                <input type="hidden" name="problem_name" value="{{ $selectedProblemName }}">
                 <button type="submit">Submit</button>
             </form>
 
-            <h2>delete problem</h2>
-
-            <form id="delete-problem-form">
-                @csrf
-                <button type="submit">Delete Problem</button>
-            </form>
+            <h2>Delete Problem</h2>
+                <form id="delete-problem-form" action="{{ route('problem.delete') }}" method="POST" onsubmit="return confirmDelete()">
+                    @csrf
+                    <input type="hidden" name="problem_name" value="{{ $selectedProblemName }}">
+                    <button type="submit" class="btn btn-danger">Delete Problem</button>
+                </form>
         @endif
 
     </div>
 
-    
+    <script>
+        function confirmDelete() {
+            return confirm('Are you sure you want to delete this problem?');
+        }
+    </script>
 </body>
+
 </html>

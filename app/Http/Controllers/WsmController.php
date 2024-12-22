@@ -283,6 +283,8 @@ public function showCriteriaTablesProblem(Request $request)
         return $data->criteria_data['problem_name'];
     })->unique();
 
+    $selectedProblemName = null;
+
     // if there is no criteria data in the session 
     if (!session('criteriaNames')) {
         
@@ -290,6 +292,7 @@ public function showCriteriaTablesProblem(Request $request)
         $criteriaNames = [];
         $criteriaWeights = [];
         $intervals = [];
+        
         
     } else {
         // Retrieve the criteria data from the session
@@ -299,6 +302,136 @@ public function showCriteriaTablesProblem(Request $request)
     }
 
 
-    return view('problemsPram.index', compact('problemNames', 'criteriaNames', 'criteriaWeights', 'intervals'));
+    return view('problemsPram.index', compact('problemNames', 'criteriaNames', 'criteriaWeights', 'intervals', 'selectedProblemName'));
 }
+
+public function showSelectedProblem(Request $request)
+{
+    // Retrieve all criteria data for the authenticated user
+    $wsmData = WsmData::where('user_id', auth()->id())->get();
+
+    // Extract the problem names from the criteria data
+    $problemNames = $wsmData->map(function ($data) {
+        return $data->criteria_data['problem_name'];
+    })->unique();
+
+    // Get the selected problem name from the request
+    $selectedProblemName = $request->input('problem_name');
+
+    // Retrieve the criteria data for the selected problem name
+    $selectedData = $wsmData->first(function ($data) use ($selectedProblemName) {
+        return $data->criteria_data['problem_name'] === $selectedProblemName;
+    });
+
+    if ($selectedData) {
+        $criteriaData = $selectedData->criteria_data;
+        $criteriaNames = $criteriaData['criteria_names'];
+        $criteriaWeights = $criteriaData['criteria_weights'];
+        $intervals = $criteriaData['intervals'];
+
+        // forget the criteria data in the session
+        session()->forget(['criteriaNames', 'criteriaWeights', 'intervals']);
+        // Store the criteria data in the session
+        session([
+            'criteriaNames' => $criteriaNames,
+            'criteriaWeights' => $criteriaWeights,
+            'intervals' => $intervals
+        ]);
+
+    } else {
+        $criteriaNames = [];
+        $criteriaWeights = [];
+        $intervals = [];
+    }
+
+    // Return the criteria tables view with the data
+    return view('problemsPram.index', compact('problemNames', 'criteriaNames', 'criteriaWeights', 'intervals', 'selectedProblemName'));
+}
+
+public function updateProblem(Request $request)
+{
+    // Validate the request data
+    $validator = Validator::make($request->all(), [
+        'problem_name' => 'required|string',
+        'criteria_names' => 'required|array|min:2',
+        'criteria_names.*' => 'required|string|distinct',
+        'criteria_weights' => 'required|array',
+        'criteria_weights.*' => 'required|numeric',
+        'intervals' => 'required|array',
+        'intervals.*' => 'required|array|size:10',
+        'intervals.*.*' => 'required|numeric'
+    ]);
+
+    if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->withInput();
+    }
+
+    // Retrieve input data from the request
+    $problemName = $request->input('problem_name');
+    $criteriaNames = $request->input('criteria_names');
+    $criteriaWeights = $request->input('criteria_weights');
+    $intervalsInput = $request->input('intervals');
+
+    // Parse the intervals input into a structured array
+    $intervals = array_map(function($intervalGroup) {
+        $parsedIntervals = [];
+        for ($i = 0; $i < count($intervalGroup) - 1; $i++) {
+            $parsedIntervals[] = [
+                'min' => (float)$intervalGroup[$i],
+                'max' => (float)$intervalGroup[$i + 1]
+            ];
+        }
+        return $parsedIntervals;
+    }, $intervalsInput);
+
+    // Update the data in the database
+    WsmData::where('user_id', auth()->id())
+    ->where('criteria_data->problem_name', $problemName)
+    ->update([
+        'criteria_data' => \DB::raw("json_set(
+            criteria_data, 
+            '$.criteria_names', json_array(" . implode(',', array_map(function($name) { return "'$name'"; }, $criteriaNames)) . "),
+            '$.criteria_weights', json_array(" . implode(',', $criteriaWeights) . "),
+            '$.intervals', json_array(" . implode(',', array_map(function($intervalGroup) {
+                return "json_array(" . implode(',', array_map(function($interval) {
+                    return "json_object('min', {$interval['min']}, 'max', {$interval['max']})";
+                }, $intervalGroup)) . ")";
+            }, $intervals)) . ")
+        )")
+    ]);
+
+    //update the session data
+    session([ 
+        'problem_name' => $problemName,
+        'criteriaNames' => $criteriaNames,
+        'criteriaWeights' => $criteriaWeights,
+        'intervals' => $intervals
+    ]);
+
+
+
+    return redirect()->route('problem.params');
+}
+
+public function deleteProblem(Request $request)
+{
+    // Validate the request data
+    $request->validate([
+        'problem_name' => 'required|string'
+    ]);
+
+    // Retrieve the problem name from the request
+    $problemName = $request->input('problem_name');
+
+    // Delete the problem data from the database
+    WsmData::where('user_id', auth()->id())
+        ->where('criteria_data->problem_name', $problemName)
+        ->delete();
+
+    // Forget the criteria data in the session
+    session()->forget(['problem_name','criteriaNames', 'criteriaWeights', 'intervals']);
+
+    return redirect()->route('problem.params');
+}
+
 }

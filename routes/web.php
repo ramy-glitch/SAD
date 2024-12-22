@@ -28,5 +28,8 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/clear-session-data', [WsmController::class, 'clearSessionData'])->name('clear.session.data');
 
     Route::get('/problem/params', [WsmController::class, 'showProblemParams'])->name('problem.params');
+    Route::post('/problem/params/selected', [WsmController::class, 'showSelectedProblem'])->name('show.Selected.problem');
+    Route::post('/problem/update', [WsmController::class, 'updateProblem'])->name('problem.update');
+    Route::post('/problem/delete', [WsmController::class, 'deleteProblem'])->name('problem.delete');
 
 });
