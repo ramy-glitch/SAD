@@ -43,9 +43,13 @@
                             <td>{{ $name }}</td>
                             <td>{{ $criteriaWeights[$index] }}</td>
                             <td>
-                                @foreach($intervals[$index] as $interval)
+                            @foreach($intervals[$index] as $i => $interval)
+                                @if($i == 0)
                                     [{{ $interval['min'] }}-{{ $interval['max'] }}]<br>
-                                @endforeach
+                                @else
+                                    ]{{ $interval['min'] }}-{{ $interval['max'] }}]<br>
+                                @endif
+                            @endforeach
                             </td>
                         </tr>
                     @endforeach

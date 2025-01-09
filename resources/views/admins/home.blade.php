@@ -46,7 +46,6 @@
             <img src="{{ asset('images/wsm-gdynia.svg') }}" alt="Image 1">
             <p><a href="{{route('wsm.index')}}">Click here</a></p>
         </div>
-
         <!-- Add more blocks as needed -->
     </div>
 </body>
