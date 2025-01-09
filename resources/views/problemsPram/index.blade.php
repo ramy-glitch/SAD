@@ -27,7 +27,7 @@
                     @endforeach
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Select</button>
         </form>
 
         @if(isset($criteriaNames) && !empty($criteriaNames))
@@ -56,14 +56,14 @@
                     </div>
                 @endforeach
                 <input type="hidden" name="problem_name" value="{{ $selectedProblemName }}">
-                <button type="submit">Submit</button>
+                <button type="submit">Update</button>
             </form>
 
             <h2>Delete Problem</h2>
                 <form id="delete-problem-form" action="{{ route('problem.delete') }}" method="POST" onsubmit="return confirmDelete()">
                     @csrf
                     <input type="hidden" name="problem_name" value="{{ $selectedProblemName }}">
-                    <button type="submit" class="btn btn-danger">Delete Problem</button>
+                    <button type="submit" class="btn btn-danger" style="background-color: red;">Delete Problem</button>
                 </form>
         @endif
 

@@ -24,7 +24,7 @@
                     @endforeach
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Select</button>
         </form>
 
         @if(isset($criteriaNames) && !empty($criteriaNames))
@@ -91,31 +91,32 @@
     <div class="modal fade" id="add-alternative-modal" tabindex="-1" role="dialog" aria-labelledby="addAlternativeModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form id="add-alternative-form" method="POST" action="{{ route('store.alternative') }}">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addAlternativeModalLabel">Add Alternative</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+            <form id="add-alternative-form" method="POST" action="{{ route('store.alternative') }}">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAlternativeModalLabel">Add Alternative</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="alternative_name">Alternative Name</label>
+                        <input type="text" class="form-control" id="alternative_name" name="alternative_name" required>
                     </div>
-                    <div class="modal-body">
+                    @foreach($criteriaNames as $index => $name)
                         <div class="form-group">
-                            <label for="alternative_name">Alternative Name</label>
-                            <input type="text" class="form-control" id="alternative_name" name="alternative_name" required>
+                            <label for="real_value_{{ $index }}">{{ $name }} Real Value</label>
+                            <input type="number" class="form-control" id="real_value_{{ $index }}" name="real_values[]" required>
+                            <span id="error_real_value_{{ $index }}" class="text-danger" style="display:none;"></span>
                         </div>
-                        @foreach($criteriaNames as $index => $name)
-                            <div class="form-group">
-                                <label for="real_value_{{ $index }}">{{ $name }} Real Value</label>
-                                <input type="number" class="form-control" id="real_value_{{ $index }}" name="real_values[]" required>
-                            </div>
-                        @endforeach
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save Alternative</button>
-                    </div>
-                </form>
+                    @endforeach
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Alternative</button>
+                </div>
+            </form>
             </div>
         </div>
     </div>
@@ -145,6 +146,63 @@
                 });
             }
         });
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('add-alternative-form');
+    const realValuesInputs = document.querySelectorAll('input[name="real_values[]"]');
+    const intervals = @json(session('intervals', []));
+
+    form.addEventListener('submit', function(event) {
+        let isValid = true;
+        realValuesInputs.forEach((input, index) => {
+            const value = parseFloat(input.value);
+            const interval = intervals[index];
+            const errorSpan = document.getElementById(`error_real_value_${index}`);
+            if (value < interval[0].min || value > interval[interval.length - 1].max) {
+                isValid = false;
+                errorSpan.textContent = `Value must be between ${interval[0].min} and ${interval[interval.length - 1].max}`;
+                errorSpan.style.display = 'block';
+            } else {
+                errorSpan.textContent = '';
+                errorSpan.style.display = 'none';
+            }
+        });
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+});
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+        const alternatives = @json(session('alternatives', []));
+        const existingAlternativeNames = alternatives.map(alternative => alternative.name);
+
+        document.getElementById('add-alternative-form').addEventListener('submit', function(event) {
+            const alternativeNameInput = document.getElementById('alternative_name');
+            const alternativeNameError = document.createElement('span');
+            alternativeNameError.id = 'alternative_name_error';
+            alternativeNameError.className = 'text-danger';
+            alternativeNameError.style.display = 'none';
+            alternativeNameInput.parentNode.appendChild(alternativeNameError);
+
+            const alternativeName = alternativeNameInput.value.trim();
+
+            if (existingAlternativeNames.includes(alternativeName)) {
+                event.preventDefault();
+                alternativeNameError.textContent = 'The alternative name already exists. Please choose a different name.';
+                alternativeNameError.style.display = 'block';
+                alternativeNameInput.focus();
+            } else {
+                alternativeNameError.textContent = '';
+                alternativeNameError.style.display = 'none';
+            }
+        });
+    });
+
 
     </script>
 </body>
